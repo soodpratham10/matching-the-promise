@@ -6,6 +6,8 @@
 
 **[▶ Play The Rate Storm](https://soodpratham10.shinyapps.io/matching-the-promise/)** (in your browser, no installation needed)
 
+[![The Rate Storm: a near-matched portfolio stays in fair weather through a steepener while the barbell, all cash and all long sink below water](docs/game.png)](https://soodpratham10.shinyapps.io/matching-the-promise/)
+
 ## You've just been made investment actuary
 
 **Prairie Promise Annuities** is closed. It sells nothing new. All it does is keep one promise: 10,000 retirees, all aged 65, will each receive $10,000 at the end of every year for as long as they live.
