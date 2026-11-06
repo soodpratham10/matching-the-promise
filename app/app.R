@@ -416,7 +416,7 @@ server <- function(input, output, session) {
                check.names = FALSE)
   })
 
-  # ---------- Chapter 1 ----------
+  # ----------- Chapter 1 -----------
   c1 <- reactive({
     lc <- liability_cashflows(n_lives = input$c1_n, payment = input$c1_pay, age = input$c1_age)
     list(lc = lc, rp = rate_profile(lc$cashflow, lc$t, input$c1_i))
