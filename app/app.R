@@ -110,6 +110,9 @@ css <- sprintf("
   .warn { color: %s; font-weight: 700; }
   .fineprint { color: %s; font-size: 0.82em; font-style: italic; margin-top: 10px; }
   a { color: %s; }
+  .chart-key { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: center; margin-top: 8px; font-size: 0.85em; color: #93a8bd; }
+  .chart-key .sw { display: inline-block; width: 22px; height: 0; border-top: 3px dashed; vertical-align: middle; margin-right: 6px; }
+  .chart-key .sw.solid { border-top-style: solid; border-top-width: 4px; }
 ",
   PAL$ink, PAL$text, PAL$text,
   PAL$ink, PAL$line, PAL$brass,
@@ -125,7 +128,7 @@ css <- sprintf("
   PAL$brass, PAL$brass, PAL$brass, PAL$ink, PAL$brass, PAL$line, PAL$line, PAL$muted,
   PAL$panel, PAL$text, PAL$line, PAL$panel, PAL$text,
   PAL$brass, PAL$ink, PAL$ink,
-  PAL$deep, PAL$line, PAL$ink, PAL$muted,
+  PAL$deep, PAL$line, PAL$text, PAL$muted,
   PAL$ink, PAL$brass, PAL$brass,
   PAL$foam, PAL$foam,
   PAL$text, PAL$text, PAL$line,
@@ -176,7 +179,7 @@ tab_play <- tabPanel("The Storm",
     ),
     column(8,
       uiOutput("meter"),
-      deck("The voyage", plotOutput("surplus_plot", height = "330px")),
+      deck("The voyage", plotOutput("surplus_plot", height = "330px"), uiOutput("voyage_key")),
       deck("The weather", plotOutput("rate_plot", height = "190px")),
       fluidRow(
         column(7, uiOutput("newspaper")),
@@ -360,9 +363,16 @@ server <- function(input, output, session) {
     lines(r$sim$year, r$sim$surplus / 1e6, lwd = 3.5, col = PLAYER_COL)
     abline(h = 0, col = PAL$storm, lwd = 1.5)
     text(0, yl[1], "below the line: underwater", adj = c(0, -0.6), col = PAL$storm, cex = 0.8)
-    legend("topleft", c("Your hold", unname(STRATEGY_LABELS)), col = c(PLAYER_COL, COMPARE_COL),
-           lty = c(1, rep(2, 5)), lwd = c(3.5, rep(1.6, 5)), bty = "n", cex = 0.85, text.col = PAL$text)
   }, bg = PAL$deep)
+
+  output$voyage_key <- renderUI({
+    req(input$go > 0)
+    item <- function(lab, col, solid = FALSE)
+      span(span(class = if (solid) "sw solid" else "sw", style = sprintf("border-top-color: %s;", col)), lab)
+    div(class = "chart-key",
+      item("Your hold", PLAYER_COL, solid = TRUE),
+      lapply(seq_along(STRATEGY_LABELS), function(k) item(unname(STRATEGY_LABELS)[k], COMPARE_COL[k])))
+  })
 
   output$rate_plot <- renderPlot({
     req(input$go > 0)
@@ -416,7 +426,7 @@ server <- function(input, output, session) {
                check.names = FALSE)
   })
 
-  # ----------- Chapter 1 -----------
+  # ---------- Chapter 1 ----------
   c1 <- reactive({
     lc <- liability_cashflows(n_lives = input$c1_n, payment = input$c1_pay, age = input$c1_age)
     list(lc = lc, rp = rate_profile(lc$cashflow, lc$t, input$c1_i))
